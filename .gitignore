@@ -1,0 +1,13 @@
+# Ignore everything by default
+*
+
+# But keep files with these extensions
+!*.cpp
+!*.py
+!*.sh
+
+# Keep directories (so git can traverse them)
+!*/
+
+# Keep .gitignore itself
+!.gitignore
