@@ -6,6 +6,9 @@
 !*.py
 !*.sh
 
+# Keep specific files
+!kactl.pdf
+
 # Keep directories (so git can traverse them)
 !*/
 
