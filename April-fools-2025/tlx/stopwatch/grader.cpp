@@ -1,0 +1,45 @@
+#include "stopwatch.h"
+#include <bitset>
+#include <chrono> 
+#include <climits>
+#include <iostream>
+#include <random>
+
+mt19937 rng;
+const string secretString = "example-secret"; // Judge will use different secret
+
+void stopWatch() {
+  auto now = std::chrono::system_clock::now();
+  auto now_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count();
+  auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+  std::string time_str = std::to_string(now_ns) + std::to_string(now_ms);
+  // std::cout <<time_str <<std::endl;
+  std::size_t hash_val = std::hash<std::string> {}(time_str);
+  hash_val ^= (hash_val >> 13);
+  hash_val ^= (hash_val << 7);
+  hash_val ^= (hash_val >> 17);
+  std::bitset<64> bits(hash_val);
+  for (int i = 0; i < 64; i++) {
+    if ((now_ns & (1LL << (i % 30))) != 0) {
+      bits.flip(i);
+    }
+  }
+  std::vector<unsigned int> primes = {2, 3, 5, 7, 265, 13, 17, 19, 23, 29};
+  for (auto prime : primes) {
+    hash_val = hash_val * prime + (now_ns % prime);
+  }
+  unsigned int final_seed = hash_val ^ bits.to_ullong();
+  final_seed = ((final_seed * 265U) + 265265265U) % UINT_MAX;
+  rng = std::mt19937(final_seed);
+}
+
+void lookAtWatch() {
+  // The judge will use this integer value to be your score
+  int score = rng() % 101;
+  std::cout << secretString << " " << score << std::endl;
+}
+
+int main() {
+  solution();
+  return 0;
+}

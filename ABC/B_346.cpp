@@ -1,0 +1,54 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define rep(i, a, b) for(int i = a; i < (b); ++i)
+#define per(i, a, b) for(int i = a; i > (b); --i)
+#define ar array
+#define sz(x) (int) (x).size()
+#define pii pair<int,int>
+#define fi first
+#define se second
+typedef long long ll;
+typedef pair<ll,ll> pll;
+typedef pair<double,double> pdd;
+typedef pair<double,int> pdi;
+typedef vector<int> vi;
+
+template<typename T>
+void min_self(T& A, T B) {
+    A = min(A,B);
+}
+template<typename T>
+void max_self(T& A, T B) {
+    A = max(A,B);
+}
+
+const int mxn=1e5;
+int w,b;
+
+void solve() {
+    cin >>w >>b;
+    string s0 = "wbwbwwbwbwbw";
+    string s = "";
+    while(sz(s)<220) {
+        s += s0;
+    }
+    rep(i,0,sz(s)-w-b+1) {
+        int w0=0;
+        rep(j,i,i+w+b) {
+            w0 += s[j]=='w';
+        }
+        if(w==w0) {
+            cout <<"Yes\n";
+            return;
+        }
+    }
+    cout <<"No\n";
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    solve();
+}

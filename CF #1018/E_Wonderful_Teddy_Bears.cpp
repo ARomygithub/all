@@ -1,0 +1,77 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define rep(i, a, b) for(int i = a; i < (b); ++i)
+#define per(i, a, b) for(int i = a; i > (b); --i)
+#define ar array
+#define sz(x) (int) (x).size()
+#define pii pair<int,int>
+#define fi first
+#define se second
+typedef long long ll;
+typedef pair<ll,ll> pll;
+typedef pair<double,double> pdd;
+typedef pair<double,int> pdi;
+typedef vector<int> vi;
+#define all(x) (x).begin(), (x).end()
+
+template<typename T>
+void min_self(T& A, T B) {
+    A = min(A,B);
+}
+template<typename T>
+void max_self(T& A, T B) {
+    A = max(A,B);
+}
+
+const int mxn=2e5;
+int n,t;
+string s;
+
+void solve() {
+    cin >>n;
+    cin >>s;
+    int ctp = 0;
+    ll ans = 0;
+    rep(i,0,n) {
+        if(s[i]=='P') {
+            ctp++;
+        } else {
+            ans += ctp;
+        }
+    }
+    stack<char> st;
+    rep(i,0,n) {
+        if(sz(st) && st.top()==s[i]) {
+            st.pop();
+        } else {
+            st.push(s[i]);
+        }
+    }
+    while(sz(st) && st.top()=='P') {
+        st.pop();
+    }
+    int ct = 0;
+    while(sz(st)) {
+        if(sz(st)>=2) {
+            ct++;
+        }
+        rep(i,0,4) {
+            if(sz(st)) {
+                st.pop();
+            }
+        }
+    }
+    ans = ct + (ans-ct + 1)/2;
+    cout <<ans <<"\n";
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    cin >>t;
+    while(t--) {
+        solve();
+    }
+}

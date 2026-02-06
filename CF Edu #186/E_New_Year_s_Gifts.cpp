@@ -1,0 +1,85 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define rep(i, a, b) for(int i = a; i < (b); ++i)
+#define per(i, a, b) for(int i = a; i > (b); --i)
+#define ar array
+#define sz(x) (int) (x).size()
+#define pii pair<int,int>
+#define fi first
+#define se second
+typedef long long ll;
+typedef pair<ll,ll> pll;
+typedef pair<double,double> pdd;
+typedef pair<double,int> pdi;
+typedef vector<int> vi;
+#define all(x) (x).begin(), (x).end()
+
+template<typename T>
+void min_self(T& A, T B) {
+    A = min(A,B);
+}
+template<typename T>
+void max_self(T& A, T B) {
+    A = max(A,B);
+}
+
+const int mxn=2e5;
+int n,m,t;
+int a[mxn],x[mxn],y[mxn],z[mxn];
+ll k;
+
+void solve() {
+    cin >>n >>m >>k;
+    rep(i,0,m) {
+        cin >>a[i];
+    }
+    rep(i,0,n) {
+        cin >>x[i] >>y[i] >>z[i];
+    }
+    vector<pii> v;
+    rep(i,0,n) {
+        k -= y[i];
+        v.push_back({x[i],z[i]-y[i]});
+    }
+    int ans = 0;
+    sort(a,a+m);
+    sort(all(v));
+    int idx = 0;
+    multiset<int> ms;
+    rep(i,0,m) {
+        while(idx<n && v[idx].fi<=a[i]) {
+            ms.insert(v[idx].se);
+            idx++;
+        }
+        if(sz(ms)) {
+            ans++;
+            auto it = ms.end(); it--;
+            ms.erase(it);
+        }
+    }
+    while(idx<n) {
+        ms.insert(v[idx].se);
+        idx++;
+    }
+    while(k && sz(ms)) {
+        if((*ms.begin()) <= k) {
+            ans++;
+            k -= (*ms.begin());
+            ms.erase(ms.begin());
+        } else {
+            break;
+        }
+    }
+    cout <<ans <<"\n";
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    cin >>t;
+    while(t--) {
+        solve();
+    }
+}

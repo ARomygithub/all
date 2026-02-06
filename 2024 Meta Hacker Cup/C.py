@@ -1,0 +1,10 @@
+tc = int(input())
+for i in range(tc):
+    # print(input().split())
+    w, g, l = input().split()
+    w = int(w)
+    g = int(g)
+    l = int(l)
+    # w, g, l = list(map(input().split(),int()))
+    ans = (w-g)*(l*2+1)
+    print(f"Case #{i+1}: {ans}")

@@ -1,0 +1,166 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define rep(i, a, b) for(int i = a; i < (b); ++i)
+#define per(i, a, b) for(int i = a; i > (b); --i)
+#define ar array
+#define sz(x) (int) (x).size()
+#define pii pair<int,int>
+#define fi first
+#define se second
+typedef long long ll;
+typedef pair<ll,ll> pll;
+typedef pair<double,double> pdd;
+typedef pair<double,int> pdi;
+typedef vector<int> vi;
+
+template<typename T>
+void min_self(T& A, T B) {
+    A = min(A,B);
+}
+template<typename T>
+void max_self(T& A, T B) {
+    A = max(A,B);
+}
+
+template <class T> int sgn(T x) { return (x > 0) - (x < 0); }
+template<class T>
+struct Point {
+    typedef Point P;
+    T x, y;
+    explicit Point(T x=0, T y=0) : x(x), y(y) {}
+    bool operator<(P p) const { return tie(x,y) < tie(p.x,p.y); }
+    bool operator==(P p) const { return tie(x,y)==tie(p.x,p.y); }
+    P operator+(P p) const { return P(x+p.x, y+p.y); }
+    P operator-(P p) const { return P(x-p.x, y-p.y); }
+    P operator*(T d) const { return P(x*d, y*d); }
+    P operator/(T d) const { return P(x/d, y/d); }
+    T dot(P p) const { return x*p.x + y*p.y; }
+    T cross(P p) const { return x*p.y - y*p.x; }
+    T cross(P a, P b) const { return (a-*this).cross(b-*this); }
+    T dist2() const { return x*x + y*y; }
+    double dist() const { return sqrt((double)dist2()); }
+    // angle to x-axis in interval [-pi, pi]
+    double angle() const { return atan2(y, x); }
+    P unit() const { return *this/dist(); } // makes dist()=1
+    P perp() const { return P(-y, x); } // rotates +90 degrees
+    P normal() const { return perp().unit(); }
+    // returns point rotated 'a' radians ccw around the origin
+    P rotate(double a) const {
+        return P(x*cos(a)-y*sin(a),x*sin(a)+y*cos(a)); }
+    friend ostream& operator<<(ostream& os, P p) {
+        return os << "(" << p.x << "," << p.y << ")"; }
+};
+
+template<class P> bool onSegment(P s, P e, P p) {
+    return p.cross(s, e) == 0 && (s - p).dot(e - p) <= 0;
+}
+
+typedef Point<double> P;
+double segDist(P& s, P& e, P& p) {
+    if (s==e) return (p-s).dist();
+    auto d = (e-s).dist2(), t = min(d,max(.0,(p-s).dot(e-s)));
+    return ((p-s)*d-(e-s)*t).dist()/d;
+}
+
+template<class P>
+bool inPolygon(vector<P> &p, P a, bool strict = true) {
+    int cnt = 0, n = sz(p);
+    rep(i,0,n) {
+        P q = p[(i + 1) % n];
+        if (onSegment(p[i], q, a)) return !strict;
+        //or: if (segDist(p[i], q, a) <= eps) return !strict;
+        cnt ^= ((a.y<p[i].y) - (a.y<q.y)) * a.cross(p[i], q) > 0;
+    }
+    return cnt;
+}
+
+P polygonCenter(const vector<P>& v) {
+    P res(0, 0); double A = 0;
+    for (int i = 0, j = sz(v) - 1; i < sz(v); j = i++) {
+        res = res + (v[i] + v[j]) * v[j].cross(v[i]);
+        A += v[j].cross(v[i]);
+    }
+    return res / A / 3;
+}
+
+template<class P>
+pair<int, P> lineInter(P s1, P e1, P s2, P e2) {
+    auto d = (e1 - s1).cross(e2 - s2);
+    if (d == 0) // if parallel
+        return {-(s1.cross(e1, s2) == 0), P(0, 0)};
+    auto p = s2.cross(e1, e2), q = s2.cross(e2, s1);
+    return {1, (s1 * p + e1 * q) / d};
+}
+
+vector<P> polygonCut(const vector<P>& poly, P s, P e) {
+    vector<P> res;
+    rep(i,0,sz(poly)) {
+        P cur = poly[i], prev = i ? poly[i-1] : poly.back();
+        bool side = s.cross(e, cur) < 0;
+        if (side != (s.cross(e, prev) < 0))
+            res.push_back(lineInter(s, e, cur, prev).second);
+        if (side)
+            res.push_back(cur);
+        if(side==(s.cross(e, prev) < 0) && s.cross(e, cur)==0.0) {
+            res.push_back(cur);
+        }
+    }
+    return res;
+}
+
+const int mxn=50,mxm=2e5;
+int n,m,q;
+
+void solve() {
+    cin >>n;
+    vector<P> poly(n), inner(n);
+    rep(i,0,n) {
+        cin >>poly[i].x >>poly[i].y;
+        inner[i].x = poly[i].x; inner[i].y = poly[i].y;
+    }
+    P center = polygonCenter(poly);
+    cin >>m;
+    double u0=0, v0=0;
+    rep(i,0,m) {
+        double u,v; cin >>u >>v;
+        if(i==0) {
+            rep(j,0,n) {
+                inner[j].x +=u; inner[j].y +=v;
+            }
+            center.x += u; center.y += v;
+            u0 = u, v0 = v;
+            continue;
+        }
+        rep(j,0,n) {
+            P cur = poly[j], prev = j? poly[j-1] : poly[n-1];
+            P s(prev.x+u, prev.y+v), e(cur.x+u, cur.y+v);
+            prev.x += u0, prev.y += v0;
+            cur.x += u0, cur.y += v0;
+            if(prev.cross(cur, center) > 0) {
+                swap(s,e);
+            }
+            inner = polygonCut(inner, s, e);
+            // cout <<sz(inner) <<endl;
+            // rep(ii,0,sz(inner)) {
+            //     cout <<fixed <<setprecision(3) <<inner[ii].x <<" " <<inner[ii].y <<"\n";
+            // }
+        }
+    }
+    cin >>q;
+    while(q--) {
+        P qry; cin >>qry.x >>qry.y;
+        if(inPolygon(inner, qry, 0)) {
+            cout <<"Yes\n";
+        } else {
+            cout <<"No\n";
+        }
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    cout.tie(0);
+    solve();
+}
