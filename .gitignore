@@ -8,6 +8,7 @@
 
 # Keep specific files
 !kactl.pdf
+!content.zip
 
 # Keep directories (so git can traverse them)
 !*/
